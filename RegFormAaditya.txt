@@ -1,0 +1,277 @@
+﻿MainActivity.java
+
+
+package com.example.regform;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+
+import java.util.ArrayList;
+
+
+public class MainActivity extends AppCompatActivity {
+   CheckBox c1 , c2 , c3;
+   RadioGroup radioGroup;
+   String qual = "", gender = "", subjectSelected = "";
+   Spinner spinner;
+   ArrayList<String> arrSubjects = new ArrayList<>(); //list that'll be shown in the spinner during the drop down action
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       Button button = findViewById(R.id.submit);
+       radioGroup = findViewById(R.id.radios);
+       spinner = findViewById(R.id.subjects);
+       //adding subjects in the array list
+       arrSubjects.add("Mathematics");
+       arrSubjects.add("Physics");
+       arrSubjects.add("Chemistry");
+       //implementing an ArrayAdapter
+
+
+       ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, arrSubjects);
+       spinner.setAdapter(spinnerAdapter);
+       spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+           @Override
+           public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+               if(position == 1){
+                   //mathematics is selected
+                   subjectSelected = "Mathematics";
+               }
+               else if(position == 2){
+                   subjectSelected = "Physics";
+               }
+               else{
+                   subjectSelected = "Chemistry";
+               }
+           }
+
+
+           @Override
+           public void onNothingSelected(AdapterView<?> adapterView) {
+               subjectSelected = "";
+           }
+       });
+       button.setOnClickListener(new View.OnClickListener(){
+           @Override
+           public void onClick(View view){
+               c1 = findViewById(R.id.BE);
+               c2 = findViewById(R.id.MBA);
+               c3 = findViewById(R.id.PHD);
+               if(c1.isChecked()){
+                   qual = "BE";
+               }
+               if(c2.isChecked()){
+                   qual = "MBA";
+               }
+               if(c3.isChecked()){
+                   qual = "PhD";
+               }
+
+
+               //i need to find the button that is checked in the radiogroup
+               int id = radioGroup.getCheckedRadioButtonId();
+               Button checkedRadio = findViewById(id);
+               gender = checkedRadio.getText().toString();
+
+
+               Intent i = new Intent(MainActivity.this, MainActivity2.class);
+               if(qual.equals("") || subjectSelected.equals("") || gender.equals("")){
+                   Toast toast = Toast.makeText(getApplicationContext(), "Can not leave any field unattended", Toast.LENGTH_SHORT);
+                   toast.show();
+               }
+               else{
+                   i.putExtra("qual", qual);
+                   i.putExtra("gender", gender);
+                   i.putExtra("subjectSelected", subjectSelected);
+                   startActivity(i);
+               }
+           }
+       });
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+Activity_main.xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   tools:context=".MainActivity">
+
+
+   <LinearLayout
+       android:orientation="vertical"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       >
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Select the subject"/>
+
+
+       <Spinner
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:id="@+id/subjects" />
+   </LinearLayout>
+
+
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Select your gender"/>
+   <RadioGroup
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/radios">
+       <RadioButton
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Gender1"
+           android:id="@+id/gender1"/>
+       <RadioButton
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Gender2"
+           android:id="@+id/gender2"/>
+       <RadioButton
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Gender3"
+           android:id="@+id/gender3"/>
+   </RadioGroup>
+
+
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Select your highest qualification"/>
+   <CheckBox
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/BE"
+       android:text="BE"/>
+   <CheckBox
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/MBA"
+       android:text="MBA"/>
+   <CheckBox
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/PHD"
+       android:text="PhD"/>
+
+
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Submit"
+       android:id="@+id/submit"/>
+
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+MainActivity2.java
+
+
+package com.example.regform;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import android.os.Bundle;
+import android.widget.TextView;
+
+
+import org.w3c.dom.Text;
+
+
+public class MainActivity2 extends AppCompatActivity {
+
+
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main2);
+       TextView tv = findViewById(R.id.tv);
+       String data1 = getIntent().getStringExtra("qual");
+       String data2 = getIntent().getStringExtra("gender");
+       String data3 = getIntent().getStringExtra("subjectSelected");
+       tv.setText("Your choice of subject is : " + data3 + ", Your gender is  : " + data2 + ", Qualification is  :  " +  data1);
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Activity_main2.xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity2">
+
+
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text=""
+       android:id="@+id/tv"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

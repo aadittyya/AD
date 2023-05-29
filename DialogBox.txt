@@ -1,0 +1,265 @@
+﻿MainActivity.java
+
+
+package com.example.customdialogbox;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import android.app.Dialog;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import org.w3c.dom.Text;
+
+
+public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener{
+   Button btn;
+   EditText editText;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+
+
+       //comtext menu programming
+       TextView textView = findViewById(R.id.contextMenu);
+       registerForContextMenu(textView);
+
+
+       editText = findViewById(R.id.name);
+       btn = findViewById(R.id.submit);
+       btn.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               String name = editText.getText().toString();
+               //declare dialog here
+               final Dialog dialog = new Dialog(MainActivity.this);
+               dialog.setContentView(R.layout.custom_dialog_layout);
+               //accessing the button of the dialog
+               Button button = dialog.findViewById(R.id.ok);
+               //setting the onClick listener of this dialog's button
+               button.setOnClickListener(new View.OnClickListener() {
+                   @Override
+                   public void onClick(View view) {
+                       Toast.makeText(getApplicationContext(), "Submitted", Toast.LENGTH_SHORT);
+                       dialog.dismiss();
+                   }
+               });
+               dialog.show();
+           }
+       });
+
+
+   }
+
+
+   public void showPopup(View v){
+       PopupMenu popup = new PopupMenu(this, v);
+       popup.setOnMenuItemClickListener(this);
+       popup.inflate(R.menu.popup_menu);
+       popup.show();
+   }
+
+
+   @Override
+   public boolean onMenuItemClick(MenuItem item){
+       switch(item.getItemId()){
+           case R.id.item1:
+               Toast.makeText(this, "Item1 clicked", Toast.LENGTH_SHORT).show();
+               return true;
+           case R.id.item2:
+               Toast.makeText(this, "Item2 clicked", Toast.LENGTH_SHORT).show();
+               return true;
+           case R.id.item3:
+               Toast.makeText(this, "Item3 clicked", Toast.LENGTH_SHORT).show();
+               return true;
+           default: return false;
+       }
+   }
+
+
+   @Override
+   public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo){
+       super.onCreateContextMenu(menu, v, menuInfo);
+       menu.setHeaderTitle("Choose from context menu");
+       getMenuInflater().inflate(R.menu.example_menu, menu);
+   }
+   @Override
+   public boolean onContextItemSelected(MenuItem item){
+       switch(item.getItemId()){
+           case R.id.option1:
+               Toast.makeText(getApplicationContext(), "option 1 selected", Toast.LENGTH_SHORT).show();
+               return true;
+           case R.id.option2:
+               Toast.makeText(getApplicationContext(), "option 2 selected", Toast.LENGTH_SHORT).show();
+               return true;
+           default:return false;
+       }
+   }
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu){
+       MenuInflater inflater = getMenuInflater();
+       inflater.inflate(R.menu.example_option_menu, menu);
+       return true;
+   }
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item){
+       switch(item.getItemId()){
+           case R.id.option1:
+               Toast.makeText(this, "Option1 selected", Toast.LENGTH_SHORT).show();
+               return true;
+           case R.id.option2:
+               Toast.makeText(this, "Option2 selected", Toast.LENGTH_SHORT).show();
+               return true;
+           case R.id.option3:
+               Toast.makeText(this, "Option3 selected", Toast.LENGTH_SHORT).show();
+               return true;
+           case R.id.option4:
+               Toast.makeText(this, "Option4 selected", Toast.LENGTH_SHORT).show();
+               return true;
+           default: return false;
+       }
+   }
+}
+
+
+
+
+activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   tools:context=".MainActivity">
+
+
+   <EditText
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:hint="Enter your name"
+       android:id="@+id/name"/>
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/contextMenu"
+       android:text="This is a context menu, long press here"
+       />
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:id="@+id/popup"
+       android:text ="select from popup"
+       android:onClick = "showPopup"
+       />
+
+
+   <Button
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="submit"
+       android:id="@+id/submit"/>
+
+
+</LinearLayout>
+
+
+
+
+
+
+//create a menu directory in the res folder, and create the menu resource files in that folder
+
+
+example_menu.xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+   <item android:title="Option1"
+       android:id="@+id/option1"/>
+   <item android:title="Option2"
+       android:id="@+id/option2"/>
+   <item android:title="Option3"
+       android:id="@+id/option3">
+       <menu>
+           <item android:id="@+id/option4"
+               android:title="option4"/>
+           <item android:id="@+id/option5"
+               android:title="option5"/>
+       </menu>
+   </item>
+</menu>
+
+
+custom_dialog_layout.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:layout_width="match_parent"
+   android:layout_height="wrap_content"
+   android:orientation="vertical"
+   android:background="@color/purple_200">
+   <ImageView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:src="@drawable/baseline_cloud_done_24"/>
+   <LinearLayout
+       android:orientation="vertical"
+       android:background="@color/white"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content">
+       <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="Success"
+           android:textStyle="bold"
+           />
+
+
+       <TextView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="Your registration is succesful"/>
+
+
+       <Button
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="OK"
+           android:backgroundTint="@color/teal_200"
+           android:id="@+id/ok"/>
+
+
+   </LinearLayout>
+
+
+</LinearLayout>
+
+
+
+
+popup_menu.xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+   <item android:id = "@+id/item1"
+       android:title="Item1"/>
+   <item android:id = "@+id/item2"
+       android:title="Item2"/>
+   <item android:id = "@+id/item3"
+       android:title="Item3"/>
+</menu>

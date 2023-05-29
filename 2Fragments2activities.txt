@@ -1,0 +1,406 @@
+﻿MainActivity.java
+
+
+package com.example.twofragtwoactivities;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+
+import android.os.Bundle;
+
+
+public class MainActivity extends AppCompatActivity implements AFragment.FragmentAListener, BFragment.FragmentBListener {
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main);
+       AFragment aFragment = new AFragment();
+       FragmentManager fm = getSupportFragmentManager();
+       FragmentTransaction ft = fm.beginTransaction();
+       ft.add(R.id.frame1, aFragment);
+       ft.commit();
+   }
+
+
+   @Override
+   public void sendData(CharSequence data) {
+
+
+   }
+
+
+   @Override
+   public void sendDataB(CharSequence data) {
+
+
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+MainActivity2.java
+
+
+package com.example.twofragtwoactivities;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.TextView;
+
+
+public class MainActivity2 extends AppCompatActivity implements AFragment.FragmentAListener, BFragment.FragmentBListener {
+   TextView textView;
+   CharSequence dataReceived;
+   @Override
+   protected void onCreate(Bundle savedInstanceState) {
+       super.onCreate(savedInstanceState);
+       setContentView(R.layout.activity_main2);
+       Intent intent = getIntent();
+       String data = intent.getStringExtra("dataFromFragment1");
+       textView = findViewById(R.id.tv);
+       textView.setText("The data received from the fragment is : " + data);
+       //we will use bundle to send this data into bfragment
+       BFragment bFragment = new BFragment();
+       Bundle bundle = new Bundle();
+       bundle.putString("datakey", data);
+       bFragment.setArguments(bundle);
+       FragmentManager fm2 = getSupportFragmentManager();
+       FragmentTransaction ft2 = fm2.beginTransaction();
+       ft2.add(R.id.frame2, bFragment);
+       ft2.commit();
+   }
+
+
+   @Override
+   public void sendData(CharSequence data) {
+       dataReceived = data;
+   }
+
+
+   @Override
+   public void sendDataB(CharSequence data) {
+       dataReceived = data;
+   }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity">
+
+
+   <TextView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Welcome to activity 1" />
+
+
+   <FrameLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/frame1"/>
+
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
+Activity_main2.xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:app="http://schemas.android.com/apk/res-auto"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".MainActivity2">
+
+
+   <TextView
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/tv"
+       android:text="Welcome to activity 2"
+       />
+
+
+   <FrameLayout
+       android:layout_below="@+id/tv"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:id="@+id/frame2"/>
+
+
+</RelativeLayout>
+
+
+
+
+AFragment.java
+package com.example.twofragtwoactivities;
+
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+
+
+public class AFragment extends Fragment {
+   Button button;
+   EditText editText;
+   CharSequence data;
+
+
+   public interface FragmentAListener{
+       void sendData(CharSequence data);
+   }
+   FragmentAListener Listener;
+
+
+   public AFragment() {
+       // Required empty public constructor
+   }
+
+
+   public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                            Bundle savedInstanceState) {
+       // Inflate the layout for this fragment
+       View view =  inflater.inflate(R.layout.fragment_a, container, false);
+       button = view.findViewById(R.id.btnFrag1);
+       editText = view.findViewById(R.id.textFrag1);
+       button.setOnClickListener(new View.OnClickListener(){
+           @Override
+           public void onClick(View view){
+               data = editText.getText();
+               data = data.toString();
+               Intent i = new Intent(getActivity(), MainActivity2.class);
+               i.putExtra("dataFromFragment1", data);
+               startActivity(i);
+           }
+       });
+       return view;
+   }
+
+
+   @Override
+   public void onAttach(@NonNull Context context) {
+       super.onAttach(context);
+       if(context instanceof FragmentAListener){
+           Listener = (FragmentAListener) context;
+       }
+       else{
+           throw new RuntimeException(context.toString() + " implement interface in your activity");
+       }
+   }
+
+
+   @Override
+   public void onDetach() {
+       super.onDetach();
+       Listener = null;
+   }
+   public void updateEditText(CharSequence data){
+       editText.setText(data);
+   }
+}
+
+
+
+
+
+
+
+
+
+
+Fragment_a.xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   android:orientation="vertical"
+   tools:context=".AFragment">
+
+
+   <EditText
+       android:layout_marginTop="30dp"
+       android:id="@+id/textFrag1"
+       android:hint="Enter the text in fragment 1"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="This is fragment 1 in activity 1, edit text here" />
+
+
+   <Button
+       android:layout_below="@+id/textFrag1"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Submit"
+       android:id="@+id/btnFrag1"/>
+
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
+BFragment.java
+
+
+package com.example.twofragtwoactivities;
+
+
+import android.content.Context;
+import android.os.Bundle;
+
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
+
+
+import org.w3c.dom.Text;
+
+
+public class BFragment extends Fragment {
+
+
+   EditText editText;
+   FragmentBListener listenerB;
+   public interface FragmentBListener{
+       void sendDataB(CharSequence data);
+   }
+   public BFragment() {
+       // Required empty public constructor
+   }
+
+
+   public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                            Bundle savedInstanceState) {
+       // Inflate the layout for this fragment
+       View view =  inflater.inflate(R.layout.fragment_b, container, false);
+       editText = view.findViewById(R.id.textFrag2);
+       String data = getArguments().getString("datakey");
+       editText.setText(data);
+       return view;
+   }
+
+
+   @Override
+   public void onAttach(@NonNull Context context) {
+       super.onAttach(context);
+       if(context instanceof FragmentBListener){
+           listenerB = (FragmentBListener) context;
+       }
+       else{
+           throw new RuntimeException(context.toString());
+       }
+   }
+
+
+   @Override
+   public void onDetach() {
+       super.onDetach();
+       listenerB = null;
+   }
+
+
+   public void updateEditText(CharSequence data){
+       editText.setText(data);
+   }
+}
+
+
+
+
+
+
+
+
+Fragment_b.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   xmlns:tools="http://schemas.android.com/tools"
+   android:layout_width="match_parent"
+   android:layout_height="match_parent"
+   tools:context=".BFragment">
+
+
+   <!-- TODO: Update blank fragment layout -->
+   <EditText
+       android:id="@+id/textFrag2"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:text="@string/hello_blank_fragment" />
+
+
+</RelativeLayout>
